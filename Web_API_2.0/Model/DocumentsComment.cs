@@ -8,5 +8,8 @@
         public DateTime Date_created { get; set; }
         public DateTime? Date_updated { get; set; }
         
+        public string NameAuthor { get; set; } = null!;
+        public string Position { get; set; } = null!;
+        
     }
 }

@@ -18,16 +18,20 @@ namespace Web_API_2._0.Controller
         [HttpGet]
         [Route("api/v1/Document/{id:int}/[controller]")]
         public IQueryable<DocumentsComment> GetComments(int id) 
-        { 
-                return db.Comments.Select(p => new DocumentsComment
-                {
-                    Id = p.IdComment,
-                    Document_id = p.IdMaterial,
-                    Text = p.CommentText,
-                    Date_created = p.DateCreated,
-                    Date_updated = p.DateUpdated
-                }).Where(p=>p.Document_id==id).AsQueryable<DocumentsComment>()&&
-                db.Employees.Select(p=> );
+        {
+            var comments = from c in db.Comments
+                           join e in db.Employees on c.AuthorOfComment equals e.IdEmployee
+                           select new DocumentsComment
+                           {
+                               Id = c.IdComment,
+                               Document_id = c.IdMaterial,
+                               Text = c.CommentText,
+                               Date_created = c.DateCreated,
+                               Date_updated = c.DateUpdated,
+                               NameAuthor = e.Surname + " " + e.FirstName,
+                               Position = e.Position!
+                           };
+            return comments.Where(p => p.Document_id == id).AsQueryable<DocumentsComment>();
         }
     
         
