@@ -54,12 +54,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.UseRateLimiter();
 app.MapControllers();
-//app.MapControllerRoute(
-//    name: "doc",
-//    pattern: "api/v1/{controller=Documents}");
-//app.MapControllerRoute(
-//    name: "comm_get",
-//    pattern: "api/v1/Document/{id}/{controller}");
 app.Map("/login/api/v1/SignIn", async (Employee emp, RoadOfRussiaContext db) =>
 {
     Employee? employee = await db.Employees.FirstOrDefaultAsync(p => p.Surname == emp.Surname && p.Password == emp.Password);
