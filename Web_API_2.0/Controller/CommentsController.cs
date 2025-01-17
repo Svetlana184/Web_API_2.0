@@ -29,7 +29,7 @@ namespace Web_API_2._0.Controller
                                Date_created = c.DateCreated,
                                Date_updated = c.DateUpdated,
                                NameAuthor = e.Surname + " " + e.FirstName,
-                               Position = e.Position!
+                               Position = e.Position
                            };
             return comments.Where(p => p.Document_id == id).AsQueryable<DocumentsComment>();
         }
