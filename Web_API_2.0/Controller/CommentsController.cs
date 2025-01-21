@@ -32,7 +32,8 @@ namespace Web_API_2._0.Controller
                                Date_updated = c.DateUpdated,
                                Author =db.Employees.Select(p=>new {name=p.Surname + " " + p.FirstName, position = p.Position}).FirstOrDefault(d=>e.IdEmployee==c.AuthorOfComment)!
                            };
-            return query.AsQueryable();
+            if  (query!=null) return query.AsQueryable();
+            return ;
         }
     
         
