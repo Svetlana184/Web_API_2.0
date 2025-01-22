@@ -79,6 +79,28 @@ app.Map("/login/api/v1/SignIn", async (Employee emp, RoadOfRussiaContext db) =>
 
 app.MapGet("/", [Authorize]() => "Hello World!");
 
+app.MapGet("/api/v1/Document/{id}/Comment",  async (int id, Comment com, RoadOfRussiaContext db) =>
+{
+    Material? material = await db.Materials.FirstOrDefaultAsync(p => p.IdMaterial == id);
+    if (material is null) return Results.Unauthorized();
+    else
+    {
+        Comment newCom = new Comment
+        {
+            IdMaterial = id,
+            CommentText = com.CommentText,
+            DateCreated = com.DateCreated,
+            DateUpdated = com.DateUpdated,
+            AuthorOfComment = 1
+        };
+        db.Comments.Add(newCom);
+        Material material1 = (await db.Materials.FirstOrDefaultAsync(p => p.IdMaterial == id))!;
+        material1.Comments += 1;
+        db.SaveChanges();
+    }
+    return Results.Ok();
+});
+
 app.Run();
 
 public class AuthOptions

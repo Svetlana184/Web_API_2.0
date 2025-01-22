@@ -2,5 +2,8 @@
 {
     public class MistakeComments
     {
+        public TimeOnly Timestamp { get; set; }
+        public string Message { get; set; } = null!;
+        public int ErrorCode { get; set; }
     }
 }

@@ -30,10 +30,21 @@ namespace Web_API_2._0.Controller
                                Text = c.CommentText,
                                Date_created = c.DateCreated,
                                Date_updated = c.DateUpdated,
-                               Author =db.Employees.Select(p=>new {name=p.Surname + " " + p.FirstName, position = p.Position}).FirstOrDefault(d=>e.IdEmployee==c.AuthorOfComment)!
+                               Author =db.Employees.Select(p=>new 
+                               {name=p.Surname + " " + p.FirstName, position = p.Position}).FirstOrDefault(d=>e.IdEmployee==c.AuthorOfComment)!
                            };
-            if  (query!=null) return query.AsQueryable();
-            return ;
+            //if (query != null) 
+            return query.AsQueryable();
+            //else
+            //{
+            //    var error = new MistakeComments
+            //    {
+            //        Timestamp = TimeOnly.FromDateTime(DateTime.Now),
+            //        Message = "не найдены комментарии для документа",
+            //        ErrorCode = 1234
+            //    };
+            //    return error;
+            //}
         }
     
         
