@@ -105,10 +105,6 @@ public partial class RoadOfRussiaContext : DbContext
 
             entity.Property(e => e.DepartmentName).HasMaxLength(100);
             entity.Property(e => e.Description).HasColumnType("ntext");
-            entity.Property(e => e.ДорогиРоссии)
-                .HasMaxLength(64)
-                .IsUnicode(false)
-                .HasColumnName("Дороги России");
 
             entity.HasOne(d => d.IdEmployeeNavigation).WithMany(p => p.Departments)
                 .HasForeignKey(d => d.IdEmployee)

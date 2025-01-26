@@ -50,10 +50,37 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 var app = builder.Build();
+
+//app.UseStatusCodePages("text/plain", "Error: Resource Not Found. Status code: {0}");
+//app.Environment.EnvironmentName = "Production";
+//if (!app.Environment.IsDevelopment())
+//{
+//    app.UseExceptionHandler(app => app.Run(async context =>
+//    {
+//        context.Response.StatusCode = 500;
+//        await context.Response.WriteAsync("Error 500. DivideByZeroException occurred!");
+//    }));
+//}
+app.UseStatusCodePages(async statusCodeContext =>
+{
+    var response = statusCodeContext.HttpContext.Response;
+    var path = statusCodeContext.HttpContext.Request.Path;
+
+    response.ContentType = "text/plain; charset=UTF-8";
+    if (response.StatusCode == 403)
+    {
+        await response.WriteAsync($"Path: {path}. Access Denied ");
+    }
+    else if (response.StatusCode == 404)
+    {
+        await response.WriteAsync($"Resource {path} Not Found");
+    }
+});
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseRateLimiter();
 app.MapControllers();
+
 app.Map("/login/api/v1/SignIn", async (Employee emp, RoadOfRussiaContext db) =>
 {
     Employee? employee = await db.Employees.FirstOrDefaultAsync(p => p.Surname == emp.Surname && p.Password == emp.Password);
@@ -79,10 +106,10 @@ app.Map("/login/api/v1/SignIn", async (Employee emp, RoadOfRussiaContext db) =>
 
 app.MapGet("/", [Authorize]() => "Hello World!");
 
-app.MapGet("/api/v1/Document/{id}/Comment",  async (int id, Comment com, RoadOfRussiaContext db) =>
+app.MapPost("/api/v1/Document/{id}/Comment", [Authorize] async (int id, Comment com, RoadOfRussiaContext db) =>
 {
     Material? material = await db.Materials.FirstOrDefaultAsync(p => p.IdMaterial == id);
-    if (material is null) return Results.Unauthorized();
+    if (material is null) return Results.NotFound();
     else
     {
         Comment newCom = new Comment
@@ -91,7 +118,7 @@ app.MapGet("/api/v1/Document/{id}/Comment",  async (int id, Comment com, RoadOfR
             CommentText = com.CommentText,
             DateCreated = com.DateCreated,
             DateUpdated = com.DateUpdated,
-            AuthorOfComment = 1
+            AuthorOfComment = com.AuthorOfComment
         };
         db.Comments.Add(newCom);
         Material material1 = (await db.Materials.FirstOrDefaultAsync(p => p.IdMaterial == id))!;
@@ -100,6 +127,7 @@ app.MapGet("/api/v1/Document/{id}/Comment",  async (int id, Comment com, RoadOfR
     }
     return Results.Ok();
 });
+
 
 app.Run();
 

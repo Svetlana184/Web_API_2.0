@@ -16,8 +16,6 @@ public partial class Department
 
     public int? IdDepartmentParent { get; set; }
 
-    public string? ДорогиРоссии { get; set; }
-
     public virtual ICollection<Employee> Employees { get; set; } = new List<Employee>();
 
     public virtual Employee? IdEmployeeNavigation { get; set; }
