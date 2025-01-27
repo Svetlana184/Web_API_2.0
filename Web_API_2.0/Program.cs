@@ -69,11 +69,33 @@ app.UseStatusCodePages(async statusCodeContext =>
     response.ContentType = "text/plain; charset=UTF-8";
     if (response.StatusCode == 403)
     {
-        await response.WriteAsync($"Path: {path}. Access Denied ");
+        Errors newError = new Errors()
+        {
+            Timestamp = TimeOnly.FromDateTime(DateTime.Now),
+            Message = "неправильные авторизационные данные",
+            ErrorCode = response.StatusCode
+        };
+        await response.WriteAsync($"{newError.Timestamp} {newError.Message} {newError.ErrorCode}");
     }
     else if (response.StatusCode == 404)
     {
-        await response.WriteAsync($"Resource {path} Not Found");
+        Errors newError = new Errors()
+        {
+            Timestamp = TimeOnly.FromDateTime(DateTime.Now),
+            Message = path + " not found",
+            ErrorCode = response.StatusCode
+        };
+        await response.WriteAsync($"{newError.Timestamp} {newError.Message} {newError.ErrorCode}");
+    }
+    else if (response.StatusCode == 400)
+    {
+        Errors newError = new Errors()
+        {
+            Timestamp = TimeOnly.FromDateTime(DateTime.Now),
+            Message = "неправильно сформирован запрос",
+            ErrorCode = response.StatusCode
+        };
+        await response.WriteAsync($"{newError.Timestamp} {newError.Message} {newError.ErrorCode}");
     }
 });
 app.UseAuthentication();
