@@ -2,7 +2,7 @@
 {
     public class Errors
     {
-        public int Timestamp { get; set; }
+        public long Timestamp { get; set; }
         public string Message { get; set; } = null!;
         public int ErrorCode { get; set; }
     }

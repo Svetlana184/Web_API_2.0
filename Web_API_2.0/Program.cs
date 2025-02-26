@@ -71,9 +71,9 @@ app.UseStatusCodePages(async statusCodeContext =>
     {
         Errors newError = new Errors()
         {
-            Timestamp = DateTime.Now.Nanosecond,
+            Timestamp = DateTime.Now.Ticks,
             Message = "неправильные авторизационные данные",
-            ErrorCode = response.StatusCode
+            ErrorCode = response.StatusCode + 1000
         };
         await response.WriteAsync($"{newError.Timestamp} {newError.Message} {newError.ErrorCode}");
     }
@@ -81,9 +81,9 @@ app.UseStatusCodePages(async statusCodeContext =>
     {
         Errors newError = new Errors()
         {
-            Timestamp = DateTime.Now.Nanosecond,
+            Timestamp = DateTime.Now.Ticks,
             Message = path + " not found",
-            ErrorCode = response.StatusCode
+            ErrorCode = response.StatusCode + 1000
         };
         await response.WriteAsJsonAsync(newError);
     }
@@ -91,9 +91,9 @@ app.UseStatusCodePages(async statusCodeContext =>
     {
         Errors newError = new Errors()
         {
-            Timestamp = DateTime.Now.Nanosecond,
+            Timestamp = DateTime.Now.Ticks,
             Message = "неправильно сформирован запрос",
-            ErrorCode = response.StatusCode
+            ErrorCode = response.StatusCode + 1000
         };
         await response.WriteAsync(newError.Message);
     }
@@ -106,7 +106,15 @@ app.MapControllers();
 app.Map("/login/api/v1/SignIn", async (Employee emp, RoadOfRussiaContext db) =>
 {
     Employee? employee = await db.Employees.FirstOrDefaultAsync(p => p.Surname == emp.Surname && p.Password == emp.Password);
-    if (employee is null) return Results.Unauthorized();
+    if (employee is null) {
+        Errors newError = new Errors()
+        {
+            Timestamp = DateTime.Now.Ticks,
+            Message = "неправильные авторизационные данные",
+            ErrorCode = 1401
+        };
+        return Results.Json(newError);
+    }
     var claims = new List<Claim> { new Claim(ClaimTypes.Surname, emp.Password) };
     // создаем JWT-токен
     var jwt = new JwtSecurityToken(
