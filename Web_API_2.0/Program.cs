@@ -71,7 +71,7 @@ app.UseStatusCodePages(async statusCodeContext =>
     {
         Errors newError = new Errors()
         {
-            Timestamp = TimeOnly.FromDateTime(DateTime.Now),
+            Timestamp = DateTime.Now.Nanosecond,
             Message = "неправильные авторизационные данные",
             ErrorCode = response.StatusCode
         };
@@ -81,21 +81,21 @@ app.UseStatusCodePages(async statusCodeContext =>
     {
         Errors newError = new Errors()
         {
-            Timestamp = TimeOnly.FromDateTime(DateTime.Now),
+            Timestamp = DateTime.Now.Nanosecond,
             Message = path + " not found",
             ErrorCode = response.StatusCode
         };
-        await response.WriteAsync($"{newError.Timestamp} {newError.Message} {newError.ErrorCode}");
+        await response.WriteAsJsonAsync(newError);
     }
     else if (response.StatusCode == 400)
     {
         Errors newError = new Errors()
         {
-            Timestamp = TimeOnly.FromDateTime(DateTime.Now),
+            Timestamp = DateTime.Now.Nanosecond,
             Message = "неправильно сформирован запрос",
             ErrorCode = response.StatusCode
         };
-        await response.WriteAsync($"{newError.Timestamp} {newError.Message} {newError.ErrorCode}");
+        await response.WriteAsync(newError.Message);
     }
 });
 app.UseAuthentication();
