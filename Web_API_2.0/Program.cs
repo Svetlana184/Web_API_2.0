@@ -51,52 +51,44 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     });
 var app = builder.Build();
 
-//app.UseStatusCodePages("text/plain", "Error: Resource Not Found. Status code: {0}");
-//app.Environment.EnvironmentName = "Production";
-//if (!app.Environment.IsDevelopment())
-//{
-//    app.UseExceptionHandler(app => app.Run(async context =>
-//    {
-//        context.Response.StatusCode = 500;
-//        await context.Response.WriteAsync("Error 500. DivideByZeroException occurred!");
-//    }));
-//}
 app.UseStatusCodePages(async statusCodeContext =>
 {
     var response = statusCodeContext.HttpContext.Response;
     var path = statusCodeContext.HttpContext.Request.Path;
 
     response.ContentType = "text/plain; charset=UTF-8";
-    if (response.StatusCode == 403)
+    string mes = "";
+    switch (response.StatusCode)
     {
-        Errors newError = new Errors()
+        case 400:
         {
-            Timestamp = DateTime.Now.Ticks,
-            Message = "неправильные авторизационные данные",
-            ErrorCode = response.StatusCode + 1000
-        };
-        await response.WriteAsync($"{newError.Timestamp} {newError.Message} {newError.ErrorCode}");
+            mes = "неправильно сформирован запрос";
+            break;
+        }
+        case 401:
+        {
+                mes = "вы не авторизованы";
+                break;
+        }
+        case 403:
+        {
+                mes = "неправильные авторизационные данные";
+                break;
+        }
+        case 404:
+        {
+                mes = path + " не найден";
+                break;
+        }
+
     }
-    else if (response.StatusCode == 404)
+    Errors newError = new Errors()
     {
-        Errors newError = new Errors()
-        {
-            Timestamp = DateTime.Now.Ticks,
-            Message = path + " not found",
-            ErrorCode = response.StatusCode + 1000
-        };
-        await response.WriteAsJsonAsync(newError);
-    }
-    else if (response.StatusCode == 400)
-    {
-        Errors newError = new Errors()
-        {
-            Timestamp = DateTime.Now.Ticks,
-            Message = "неправильно сформирован запрос",
-            ErrorCode = response.StatusCode + 1000
-        };
-        await response.WriteAsync(newError.Message);
-    }
+        Timestamp = DateTime.Now.Ticks,
+        Message = mes,
+        ErrorCode = response.StatusCode + 1000
+    };
+    await response.WriteAsJsonAsync(newError);
 });
 app.UseAuthentication();
 app.UseAuthorization();
